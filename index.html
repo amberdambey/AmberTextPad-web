@@ -1,0 +1,104 @@
+<html>
+	<head>
+		<title>Untitled - AmberTextPad</title>
+		<style>
+@media(prefers-color-scheme:dark) {
+	body {
+		background-color:black;
+		color:white;
+	}
+	textarea {
+		background-color:#202020;
+		color:#ffffff;
+	}
+}
+label {
+	user-select:none;
+}
+.menuStrip {
+	position:absolute;
+	width:100%;
+	height:23px;
+	left:0px;
+	top:0px;
+	color:black;
+	font-family:sans-serif;
+}
+.titleBar {
+	width:100%;
+	height:23px;
+	text-align:center;
+	background-color:#b0b0b0;
+	color:black;
+}
+#fileSelect {
+	display:none;
+}
+		</style>
+	</head>
+	<body style="margin:0;border:0;" onload='textBox.style.width=window.innerWidth;textBox.style.height=window.innerHeight-23;if(textBox.value!="")alert("The document Untitled has been recovered from autosave");' onresize='textBox.style.width=window.innerWidth;textBox.style.height=window.innerHeight-23;'>
+		<div class="menuStrip">
+			<input type="file" id="fileSelect" onchange='openFile();'></input>
+			<button onclick='fileSelect.click();'>Open</button>
+			<button onclick='downloadB();'>Save</button>
+			<input type="checkbox" id="wordWrapCheckbox"><label onclick='wordWrapCheckbox.click();'>Word Wrap</label></input>
+			<input type="checkbox" id="spellingCheckbox" checked onchange='textBox.setAttribute("spellcheck", (spellingCheckbox.checked?"true":"false"));'><label onclick='spellingCheckbox.click();'>Highlight Spelling</label></input>
+		</div>
+		<div class="titleBar" id="titleBar">Untitled</div>
+		<textarea id="textBox" style="width:100px;height:100px;margin:0;border:0;font-size:22px;"></textarea>
+		<script>
+// textBox.value="Hello	and this &amp; that";
+
+function openFile(event) {
+	event=event || window.event;
+	var file=event.target.files[0];
+	var reader=new FileReader();
+	reader.onload=function() {
+		textBox.value=reader.result;
+	}
+	reader.readAsText(file);
+}
+function download(filename, text) {
+	// Generate a hyperlink which downloads a Data URI
+	var tempElm=document.createElement('a');
+	tempElm.setAttribute("href", "data:text/plain;charset=utf-8,"+encodeURIComponent(text));
+	tempElm.setAttribute("download", filename);
+	// Hide it
+	tempElm.style.display = 'none';
+	// Attach it to the document
+	document.body.appendChild(tempElm);
+	// Simulate clicking it
+	tempElm.click();
+	// DESTROY IT!!!
+	document.body.removeChild(tempElm);
+}
+function downloadB() {
+	download("Untitled.txt", textBox.value);
+}
+window.onbeforeunload=function(event) {
+	// Get either event param or event
+	event=event || window.event;
+	// Check if file is empty
+	if (textBox.value=="") return;
+	// If we have an event, display dialog
+	if (event) event.returnValue="Unsaved changes. Close anyway?";
+	// If the browser is stupid, display dialog
+	return "Unsaved changes. Close anyway?";
+}
+
+// Add a listener to prevent erroneous function overlapping, and to reference textBox as "this"
+if (textBox.addEventListener) textBox.addEventListener("keydown", tabHijack, false);
+function tabHijack(event) {
+	// Get either event param or event
+	event=event || window.event;
+	if (event.keyCode==9) {
+		// Append a tab [TODO: Fix issue #1]
+		this.value+="\t";
+		// Check to see if we can call preventDefault, and proceed if we can
+		if (event.preventDefault) event.preventDefault();
+		return false;
+	}
+}
+		</script>
+	</body>
+</html>
