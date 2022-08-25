@@ -30,6 +30,7 @@ label {
 	text-align:center;
 	background-color:#b0b0b0;
 	color:black;
+	font-family:sans-serif;
 }
 #fileSelect {
 	display:none;
@@ -47,18 +48,22 @@ label {
 		<div class="titleBar" id="titleBar">Untitled</div>
 		<textarea id="textBox" style="width:100px;height:100px;margin:0;border:0;font-size:22px;font-family:monospace;"></textarea>
 		<script>
-// textBox.value="Hello	and this &amp; that";
+// textBox.value="Hello	   and this &amp; that";
 
+var filename="Untitled";
 function openFile(event) {
 	event=event || window.event;
 	var file=event.target.files[0];
+	filename=file.name;
 	var reader=new FileReader();
 	reader.onload=function() {
 		textBox.value=reader.result;
+		titleBar.innerHTML=filename;
+		document.title=filename+" - AmberTextPad";
 	}
 	reader.readAsText(file);
 }
-function download(filename, text) {
+function download(text) {
 	// Generate a hyperlink which downloads a Data URI
 	var tempElm=document.createElement('a');
 	tempElm.setAttribute("href", "data:text/plain;charset=utf-8,"+encodeURIComponent(text));
@@ -73,7 +78,7 @@ function download(filename, text) {
 	document.body.removeChild(tempElm);
 }
 function downloadB() {
-	download("Untitled.txt", textBox.value);
+	download(textBox.value);
 }
 window.onbeforeunload=function(event) {
 	// Get either event param or event
